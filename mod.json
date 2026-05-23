@@ -1,12 +1,9 @@
 {
     "geode": "5.7.1",
-    "gd": {
-        "win": "2.2081"
-    },
+    "gd": "2.2081",
     "version": "1.0.0",
     "id": "user.gd-overlay-bridge",
     "name": "GD Overlay Bridge",
     "developer": "user",
-    "description": "Writes level start/death state to a file for the rhythm overlay.",
-    "links": {}
+    "description": "Writes level start/death state to a file for the rhythm overlay."
 }
