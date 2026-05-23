@@ -7,21 +7,19 @@ on:
 
 jobs:
   build:
+    name: Build
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Geode CLI
-        uses: geode-sdk/action@main
+      - name: Build the mod
+        uses: geode-sdk/build-geode-mod@main
+        with:
+          sdk: nightly
+          target: win64
 
-      - name: Configure CMake
-        run: cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
-
-      - name: Build
-        run: cmake --build build --config RelWithDebInfo
-
-      - name: Upload .geode file
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: GDOverlayBridge
-          path: build/RelWithDebInfo/*.geode
+          path: ${{ steps.build.outputs.build-output }}
