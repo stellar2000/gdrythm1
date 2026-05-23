@@ -1,23 +1,20 @@
 name: Build Geode Mod
-
 on:
   push:
     branches: [main]
   workflow_dispatch:
-
 jobs:
   build:
     name: Build
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Build the mod
+        id: build
         uses: geode-sdk/build-geode-mod@main
         with:
           sdk: nightly
           target: win64
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
