@@ -5,17 +5,32 @@ on:
   workflow_dispatch:
 jobs:
   build:
-    name: Build
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: geode-sdk/build-geode-mod@main
-        id: build
-        with:
-          sdk: nightly
-          target: win64
-      - uses: actions/upload-artifact@v4
-        if: always()
+
+      - name: Install Geode CLI
+        run: |
+          curl -L https://github.com/geode-sdk/cli/releases/download/v3.7.4/geode-cli-v3.7.4-win.zip -o cli.zip
+          7z x cli.zip -ocli
+          ./cli/geode.exe sdk install --path geode-sdk-clone
+          ./cli/geode.exe sdk install-binaries --path geode-sdk-clone
+        shell: pwsh
+
+      - name: Configure
+        run: cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
+        shell: pwsh
+        env:
+          GEODE_SDK: ${{ github.workspace }}/geode-sdk-clone
+
+      - name: Build
+        run: cmake --build build --config RelWithDebInfo
+        shell: pwsh
+        env:
+          GEODE_SDK: ${{ github.workspace }}/geode-sdk-clone
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
         with:
           name: GDOverlayBridge
           path: build/user.gd-overlay-bridge.geode
