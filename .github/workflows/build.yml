@@ -18,9 +18,11 @@ jobs:
 
       - name: Setup SDK
         run: |
-          mkdir -p cli-profile/geode/mods
+          New-Item -ItemType Directory -Force cli-profile/geode/mods | Out-Null
           geode profile add --name GithubActions "$env:GITHUB_WORKSPACE/cli-profile/GeometryDash.exe" win
           geode sdk install "$env:GITHUB_WORKSPACE/geode-sdk-clone"
+          $env:GEODE_SDK = "$env:GITHUB_WORKSPACE/geode-sdk-clone"
+          echo "GEODE_SDK=$env:GEODE_SDK" >> $env:GITHUB_ENV
           geode sdk update nightly
           geode sdk install-binaries --platform win
         shell: pwsh
@@ -28,14 +30,10 @@ jobs:
       - name: Configure
         run: cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
         shell: pwsh
-        env:
-          GEODE_SDK: ${{ github.workspace }}/geode-sdk-clone
 
       - name: Build
         run: cmake --build build --config RelWithDebInfo
         shell: pwsh
-        env:
-          GEODE_SDK: ${{ github.workspace }}/geode-sdk-clone
 
       - name: Upload
         uses: actions/upload-artifact@v4
