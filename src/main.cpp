@@ -1,11 +1,8 @@
 #include <Geode/Geode.hpp>
 #include <Geode/modify/PlayLayer.hpp>
 #include <fstream>
-
 using namespace geode::prelude;
 
-// Writes to %TEMP%\gd_overlay_state.txt
-// Python overlay polls this file every 50ms
 static void writeState(const char* state) {
     char tmp[MAX_PATH];
     GetTempPathA(MAX_PATH, tmp);
@@ -15,23 +12,30 @@ static void writeState(const char* state) {
 }
 
 class $modify(PlayLayer) {
+    bool m_levelStarted = false;
 
-    // Called every attempt start (including first)
     void resetLevel() {
         PlayLayer::resetLevel();
+        m_levelStarted = false;
+        writeState("RESET");
+    }
+
+    void startGame() {
+        PlayLayer::startGame();
+        m_levelStarted = true;
         writeState("START");
     }
 
-    // Called when player dies
     void destroyPlayer(PlayerObject* p, GameObject* o) {
         PlayLayer::destroyPlayer(p, o);
-        writeState("DEATH");
+        if (m_levelStarted) {
+            writeState("DEATH");
+        }
     }
 
-    // Called when leaving the level
     void onQuit() {
         PlayLayer::onQuit();
+        m_levelStarted = false;
         writeState("QUIT");
     }
-
 };
