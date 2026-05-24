@@ -14,14 +14,19 @@ jobs:
         with:
           sdk: nightly
       - name: Configure CMake
-        run: cmake -B build -DCMAKE_BUILD_TYPE=Release -G Ninja
+        run: cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
         shell: pwsh
       - name: Build
-        run: cmake --build build --config Release
+        run: cmake --build build --config RelWithDebInfo
         shell: pwsh
-      - name: Upload artifact
+      - name: Collect artifact
+        run: |
+          New-Item -ItemType Directory -Force -Path output
+          Copy-Item build/user.gd-overlay-bridge.geode output/
+        shell: pwsh
+      - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: GDOverlayBridge
-          path: build/user.gd-overlay-bridge.geode
+          path: output/user.gd-overlay-bridge.geode
           if-no-files-found: error
