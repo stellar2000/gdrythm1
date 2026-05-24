@@ -12,8 +12,8 @@ jobs:
         run: |
           curl -L https://github.com/geode-sdk/cli/releases/download/v3.7.4/geode-cli-v3.7.4-win.zip -o cli.zip
           7z x cli.zip -ocli
-          ./cli/geode.exe sdk install --path geode-sdk-clone
-          ./cli/geode.exe sdk install-binaries --path geode-sdk-clone
+          ./cli/geode.exe sdk install geode-sdk-clone
+          ./cli/geode.exe sdk install-binaries --platform win
         shell: pwsh
       - name: Configure
         run: cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
