@@ -15,6 +15,9 @@ jobs:
         with:
           sdk: nightly
           target: win64
+      - name: Find geode file
+        run: Get-ChildItem -Recurse -Filter "*.geode" | Select-Object FullName
+        shell: pwsh
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
