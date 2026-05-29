@@ -16,29 +16,34 @@ class $modify(PlayLayer) {
         bool m_levelStarted = false;
     };
 
+    bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
+        if (!PlayLayer::init(level, useReplay, dontCreateObjects)) return false;
+        m_fields->m_levelStarted = false;
+        writeState("RESET");
+        return true;
+    }
+
     void resetLevel() {
         PlayLayer::resetLevel();
         m_fields->m_levelStarted = false;
         writeState("RESET");
     }
 
-    bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
-        if (!PlayLayer::init(level, useReplay, dontCreateObjects)) return false;
-        writeState("RESET");
-        return true;
-    }
-
     void update(float dt) {
         PlayLayer::update(dt);
-        if (!m_fields->m_levelStarted && !m_isDead && m_time > 0.05f) {
+        if (!m_fields->m_levelStarted && m_player1 && !m_player1->m_isDead && m_time > 0.1f) {
             m_fields->m_levelStarted = true;
             writeState("START");
         }
     }
 
-    void destroyPlayer(PlayerObject* p, GameObject* o) {
-        PlayLayer::destroyPlayer(p, o);
-        if (m_fields->m_levelStarted) {
+    void destroyPlayer(PlayerObject* player, GameObject* object) {
+        // Filter anticheat and non-player deaths exactly like Eclipse does
+        if (player != m_player1 && player != m_player2) {
+            return PlayLayer::destroyPlayer(player, object);
+        }
+        PlayLayer::destroyPlayer(player, object);
+        if (object != m_anticheatSpike && m_fields->m_levelStarted) {
             m_fields->m_levelStarted = false;
             writeState("DEATH");
         }
