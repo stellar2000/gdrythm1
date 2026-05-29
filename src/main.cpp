@@ -31,17 +31,16 @@ class $modify(PlayLayer) {
 
     void update(float dt) {
         PlayLayer::update(dt);
-        if (!m_fields->m_levelStarted && m_player1 && !m_player1->m_isDead && m_time > 0.1f) {
+        if (!m_fields->m_levelStarted && m_player1 && !m_player1->m_isDead
+                && m_gameState.m_levelTime > 0.05f) {
             m_fields->m_levelStarted = true;
             writeState("START");
         }
     }
 
     void destroyPlayer(PlayerObject* player, GameObject* object) {
-        // Filter anticheat and non-player deaths exactly like Eclipse does
-        if (player != m_player1 && player != m_player2) {
+        if (player != m_player1 && player != m_player2)
             return PlayLayer::destroyPlayer(player, object);
-        }
         PlayLayer::destroyPlayer(player, object);
         if (object != m_anticheatSpike && m_fields->m_levelStarted) {
             m_fields->m_levelStarted = false;
