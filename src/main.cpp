@@ -22,15 +22,24 @@ class $modify(PlayLayer) {
         writeState("RESET");
     }
 
-    void startGame() {
-        PlayLayer::startGame();
-        m_fields->m_levelStarted = true;
-        writeState("START");
+    bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
+        if (!PlayLayer::init(level, useReplay, dontCreateObjects)) return false;
+        writeState("RESET");
+        return true;
+    }
+
+    void update(float dt) {
+        PlayLayer::update(dt);
+        if (!m_fields->m_levelStarted && !m_isDead && m_time > 0.05f) {
+            m_fields->m_levelStarted = true;
+            writeState("START");
+        }
     }
 
     void destroyPlayer(PlayerObject* p, GameObject* o) {
         PlayLayer::destroyPlayer(p, o);
         if (m_fields->m_levelStarted) {
+            m_fields->m_levelStarted = false;
             writeState("DEATH");
         }
     }
