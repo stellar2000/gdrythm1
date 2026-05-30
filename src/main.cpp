@@ -6,16 +6,16 @@
 using namespace geode::prelude;
 
 static bool s_levelStarted = false;
+static int  s_seq          = 0;   // increments on every write so Python never misses one
 
 static void writeState(const char* state) {
     char tmp[MAX_PATH];
     GetTempPathA(MAX_PATH, tmp);
     std::string path = std::string(tmp) + "gd_overlay_state.txt";
     std::ofstream f(path, std::ios::trunc);
-    f << state;
+    f << state << '\n' << ++s_seq;
 }
 
-// Game tick — fires every frame during gameplay
 class $modify(GDOverlayBGL, GJBaseGameLayer) {
     void processCommands(float dt, bool isHalfTick, bool isLastTick) {
         GJBaseGameLayer::processCommands(dt, isHalfTick, isLastTick);
@@ -42,7 +42,6 @@ class $modify(GDOverlayPL, PlayLayer) {
         writeState("RESET");
     }
 
-    // ESC / pause button
     void pauseGame(bool p0) {
         PlayLayer::pauseGame(p0);
         writeState("PAUSE");
@@ -65,7 +64,6 @@ class $modify(GDOverlayPL, PlayLayer) {
     }
 };
 
-// Resume button (and ESC-to-resume) in the pause menu
 class $modify(GDOverlayPause, PauseLayer) {
     void onResume(CCObject* sender) {
         writeState("RESUME");
