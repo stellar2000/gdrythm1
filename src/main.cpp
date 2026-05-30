@@ -6,14 +6,16 @@
 using namespace geode::prelude;
 
 static bool s_levelStarted = false;
-static int  s_seq          = 0;   // increments on every write so Python never misses one
 
+// Append-only queue — Python reads & clears it every 50 ms.
+// Appending never overwrites a state that Python hasn't read yet,
+// so rapid RESET → START transitions are never lost.
 static void writeState(const char* state) {
     char tmp[MAX_PATH];
     GetTempPathA(MAX_PATH, tmp);
-    std::string path = std::string(tmp) + "gd_overlay_state.txt";
-    std::ofstream f(path, std::ios::trunc);
-    f << state << '\n' << ++s_seq;
+    std::string path = std::string(tmp) + "gd_overlay_queue.txt";
+    std::ofstream f(path, std::ios::app);
+    f << state << '\n';
 }
 
 class $modify(GDOverlayBGL, GJBaseGameLayer) {
